@@ -1,0 +1,179 @@
+1.数据的动态变化
+	vue响应式的数据动态显示变化是通过在Vue实例被创建时，向vue的响应系统中加入了其data对象中能找到的属性，也就是说一开始有的才行，后面添加的属性没有响应式，当这些响
+应式的数据发生变化时，视图会进行重新渲染，如果不知道后面会不会加入数据怎么办呢？没关系，预留字段，设置为空或不存在，先占个坑嘛
+
+
+2.实例的生命周期
+	每个生命周期都会有相应的钩子函数，钩子函数的this指向调用它的vue实例
+	beforeCreate:在实例被创建之前执行
+	created:在实例被创建之后执行
+	beforeMount:开始挂载编译生成的html到对应位置
+	mounted:挂载编译生成html完成，可以进行ajax请求，数据初始化（在整个生命周期中只执行一次）
+	beforeUpdate:数据发生变化要重新渲染DOM之前
+	updated:数据发生变化，重新渲染DOM完成
+	beforeDestroy：当 vm.$destroy() 被调用时
+	destroyed: 销毁完成之后
+
+
+3.模板语法
+	在底层的实现上，vue将模板编译成虚拟DOM渲染函数，结合响应系统，在应用状态改变时,vue能够智能地计算出重新渲染组件的最小代价并应用到DOM操作上
+	文本：双大括号
+	HTML：v-html指令
+	使用JavaScript表达式：每个绑定都只能包含单个表达式
+
+
+4.指令
+	带有v- 前缀的特殊属性，指令的作用是当表达式的值发生改变时，将其产生的连带作用响应式的作用于DOM上
+
+
+5.计算属性
+	computed选项。 为了不在模板中放入太多逻辑导致模板太重难以维护，vue建议将计算的方法放在实例的一个属性中，就像绑定普通属性一样绑定计算属性，
+Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新
+
+
+6.侦听器
+	Vue 通过 watch 选项提供了一个更通用的方法，来响应数据的变化。当需要在数据变化时执行异步或开销较大的操作时，这个方式是最有用的
+
+
+7.Class与Style绑定
+	绑定HTLM Class
+		对象语法：v-bind:class 动态切换多个class  v-bind:class="{ active: isActive, 'text-danger': hasError }"
+	v-bind:class 指令也可以与普通class共存
+	绑定内联样式
+		对象语法：v-bind：style  CSS 属性名可以用驼峰式 (camelCase) 或短横线分隔 (kebab-case，记得用单引号括起来) 来命名 , 其实是一个 JavaScript 对象
+
+
+8.条件渲染
+	因为 v-if 是一个指令，所以必须将它添加到一个元素上。但是如果想切换多个元素呢？此时可以把一个 <template> 元素当做不可见的包裹元素，并在上面使用 
+v-if。最终的渲染结果将不包含 <template> 元素。
+		<template v-if="ok">
+		  <h1>Title</h1>
+		  <p>Paragraph 1</p>
+		  <p>Paragraph 2</p>
+		</template>
+
+	Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。这么做除了使 Vue 变得非常快之外，还有其它一些好处。但是有时我们并不需要这种效果，
+那么我们怎么来告诉vue “这两个是独立的元素，不要复用它们” 呢？  给元素添加一个具有唯一值的 key 即可
+
+	当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级
+
+
+9.事件处理
+	可以用 v-on 指令监听 DOM 事件，并在触发时运行一些 JavaScript 代码，也可以绑定方法名，方法的定义放在实例的 methods 选项中
+	事件修饰符
+		Vue.js 为 v-on 提供了事件修饰符。之前提过，修饰符是由点开头的指令后缀来表示的
+		.stop
+		.prevent
+		.capture
+		.self
+		.once
+		--------------------------------------------------------------------------------------------------------------------------------------
+		<!-- 阻止单击事件继续传播 -->
+		<a v-on:click.stop="doThis"></a>
+		<!-- 提交事件不再重载页面 -->
+		<form v-on:submit.prevent="onSubmit"></form>
+		<!-- 修饰符可以串联 -->
+		<a v-on:click.stop.prevent="doThat"></a>
+		<!-- 只有修饰符 -->
+		<form v-on:submit.prevent></form>
+		<!-- 添加事件监听器时使用事件捕获模式 -->
+		<!-- 即内部元素触发的事件先在此处处理，然后才交由内部元素自身进行处理 -->
+		<div v-on:click.capture="doThis">...</div>
+		<!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+		<!-- 即事件不是从内部元素触发的 -->
+		<div v-on:click.self="doThat">...</div>
+		<!-- 点击事件将只会触发一次 -->
+		<a v-on:click.once="doThis"></a>
+		--------------------------------------------------------------------------------------------------------------------------------------
+		注：使用修饰符时，顺序很重要；相应的代码会以同样的顺序产生。因此，用 @click.prevent.self 会阻止所有的点击，而 @click.self.prevent 只会阻止对元素自身的点击。
+
+	按键修饰符
+		<!-- 只有在 `keyCode` 是 13 时调用 `vm.submit()` -->
+		<input v-on:keyup.13="submit">
+		记住所有的 keyCode 比较困难，所以 Vue 为最常用的按键提供了别名：
+		<!-- 同上 -->
+		<input v-on:keyup.enter="submit">
+		<!-- 缩写语法 -->
+		<input @keyup.enter="submit">
+		全部的按键别名：
+		.enter
+		.tab
+		.delete (捕获“删除”和“退格”键)
+		.esc
+		.space
+		.up
+		.down
+		.left
+		.right
+		可以通过全局 config.keyCodes 对象自定义按键修饰符别名：
+		// 可以使用 `v-on:keyup.f1`
+		Vue.config.keyCodes.f1 = 112
+
+		可以用如下修饰符来实现仅在按下相应按键时才触发鼠标或键盘事件的监听器。
+		.ctrl
+		.alt
+		.shift
+		.meta
+
+		<!-- Alt + C -->
+		<input @keyup.alt.67="clear">
+		<!-- Ctrl + Click -->
+		<div @click.ctrl="doSomething">Do something</div>
+
+
+10.表单输入绑定
+	v-model 指令在表单控件元素上创建双向数据绑定。它会根据控件类型自动选取正确的方法来更新元素。尽管有些神奇，但 v-model 本质上不过是语法糖，它负责监听用户的输入事件以更新数据，并特别处理一些极端的例子
+
+
+11.组件
+	组件 (Component) 是 Vue.js 最强大的功能之一。组件可以扩展 HTML 元素，封装可重用的代码。在较高层面上，组件是自定义元素，Vue.js 的编译器为它添加特殊功能。在有些情况下，组件也可以表现为用 is 特性进行了扩展的原生 HTML 元素
+
+	注册一个全局组件  Vue.component(tagName,options)   注意确保在初始化根实例之前注册组件
+	局部注册组件  可以通过某个 Vue 实例/组件的实例选项 components 注册仅在其作用域中可用的组件：
+					var Child = {
+					  template: '<div>A custom component!</div>'
+					}
+					new Vue({
+					  // ...
+					  components: {
+						// <my-component> 将只在父组件模板中可用
+						'my-component': Child
+					  }
+					})
+
+
+
+
+
+
+问：在使用vue-cli 脚手架工具生成的 .vue 组件文件中， export default 中暴露出来的数据为什么可以做 template 中的响应数据，其作用与 new Vue 差不多？
+
+答：首先，export default  与 new Vue 并不一样，new Vue返回一个vue的实例对象， export default 将一个组件导出
+	然后  由于用的vue-cli 脚手架生成的工程，在webpack 开发vue的同时使用了 vue-loader 
+	最后  vue-loader 是webpack 的一个loader ,专门用来处理 .vue 文件的。 PS：一个.vue文件有三块 <template></template>   <script> export default {}</script>  <style></style>
+
+
+问：以驼峰命名的属性在渲染之后会怎么显示？
+答：驼峰命名中的大写字母在渲染后会自动转成小写，但会不会与中划线相同？（好像不会）
+
+
+问：为什么data 是函数类型，而不是对象类型
+答：对象类型的话，如果多个组件引用了这个组件的话，会导致多个组件共用一个变量，使用函数return，可以在引用的时候形成自己的一份实例
+
+
+问：vue中样式污染的原因及解决方法
+答：由于各组件都有自己的样式，vue在渲染的时候是把<style></style>标签插入到html的头部，这就会造成不经意间的样式覆盖。解决方法是在每个组件的style标签上家加上
+ 	scoped 属性，原理是加了scoped 属性，vue在渲染时会为每个组件元素添加一个不同的scopeId,组件的样式作用会根据 属性选择器 来作用，但还有一个问题就是，
+ 	子组件的根元素会继承父组件的样式也可能会导致样式错乱，这是必然存在的，需要自己小心避免；
+ 	深度作用选择器：  如果你希望 scoped 样式中的一个选择器能够作用得“更深”，例如影响子组件，你可以使用 >>> 操作符
+				 <style scoped>
+					.a >>> .b { /* ... */ }
+				</style>
+				上述代码将会编译成：
+
+				.a[data-v-f3f3eg9] .b { /* ... */ }
+
+
+如果想要获取到Vue实例中选项的对象，Vue提供$进行获取  如app.$el  app.$data
+数组的过滤方法，arr.filter(callback(element,  index,     arr))  返回通过测试的元素的集合的数组
+                                   元素的值  元素的索引  被遍历的数组

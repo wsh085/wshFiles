@@ -1,0 +1,179 @@
+H5+ 实现分享功能的步骤：
+1.首先在mui.plusReady(function(){
+	里面 plus.share.getServices(function(s) {}, function() {});
+	获取终端的分享服务列表
+})
+
+2.在分享链接点击里面判断该分享是否已被授权 share.authenticated 
+  未授权认证的通过 share.authorize(function() {
+						shareMessage(share, ids[i - 1].ex);
+					}, function(e) {
+						console.log("认证授权失败：" + e.code + " - " + e.message);
+					});   授权认证并发送分享信息
+3.发送分享 void obj.send( msg, successCB, errorCB );
+msg的属性：content: (String 类型 )分享消息的文字内容
+			pictures: (Array[ String ] 类型 )分享消息的图片
+						分享消息中包含的图片路径，仅支持本地路径。 若分享平台仅支持提交一张图片，传入多张图片则仅提交第一张图片。 如果不能同时支持其它内容信息，优先级顺序为：pictures>content。
+
+			thumbs: (Array[ Stromg ] 类型 )分享消息的缩略图
+					分享消息中包含的缩略图路径，支持本地路径及网络路径。 					若分享平台仅支持提交一张图片，传入多张图片则仅提交第一张图片。 							
+					如果分享平台的信息不支持缩略图，若没有设置消息的图片（pictures）则使用缩略图，
+					否则忽略其属性值。 			注意：图片有大小限制，推荐图片小于20Kb。
+
+			href: (String 类型 )分享独立的链接
+					分享独立链接地址，仅支持网络地址（以http://或https://开头）。 		如果不能同时支持其它内容信息，优先级顺序为：href>pictures>content。
+						
+			title: (String 类型 )分享消息的标题
+					目前仅微信分享独立链接消息时支持。
+
+			geo: (GeoPosition 类型 )分享消息中包含的用户地理信息数据
+			extra: (ShareMessageExtra 类型 )分享消息扩展参数
+			interface: (String 类型 )分享消息的模式
+						可取值： "auto" - 自动选择，如果已经安装微博客户端则采用编辑界面进行分享，
+								否则采用无界面分享； "slient" -静默分享，
+								采用无界面模式进行分享； "editable" - 进入编辑界面，用户确认分享内容后发送，
+								如果当前未安装微博客户端则触发错误回调。 		
+								默认值为"auto"。（仅新浪微博分享时生效）
+
+
+mui 动态添加轮播图后图片转动不了？
+原因是ajax 还没有执行完成，已经支持mui("#slider").slider({interval: 3000}); 这段代码了，所以图片轮播无法滚动
+解决方法在 添加完成的代码后面在执行这段代码就可以了  mui("#slider").slider({interval: 3000});
+
+Json文件中不能有注释！
+
+mui里限制字数的类   限制一行 mui-ellipsis   限制两行 mui-ellipsis-2  限制三行 mui-ellipsis-3
+
+mui 中的上拉加载和下拉刷新 的回调函数 应该是定义的纯函数，不能是通过接口调用的函数，可以把接口方法的调用放在函数里就可以了，原因未知
+
+添加自定义字体
+@font-face{
+	font-family:"字体名";  //字体的名称
+	src: url(" 字体文件链接");
+}
+
+
+判断数据类型的通用方法
+alert(Object.prototype.toString.call(a) === ‘[object String]’) -------> true;
+alert(Object.prototype.toString.call(b) === ‘[object Number]’) -------> true;
+alert(Object.prototype.toString.call(c) === ‘[object Array]’) -------> true;
+alert(Object.prototype.toString.call(d) === ‘[object Date]’) -------> true;
+alert(Object.prototype.toString.call(e) === ‘[object Function]’) -------> true;
+alert(Object.prototype.toString.call(f) === ‘[object Function]’) -------> true;
+
+
+video视频在ios 中禁止全屏播放的方法
+第一步：在manifest.json 配置文件中在plus 下添加新节点"allowsInlineMediaPlayback":true,
+"plus":{
+    "allowsInlineMediaPlayback": true
+}
+第二步：在video 标签中添加 playsinline 属性
+
+
+在有些请况下需要强制英文字母换行，不然会出现横向滚动条  word-break:break-all;
+
+video标签的视频播放有时候视频会有两边留白，导致视频内容与video标签大小不一样大，设置object-fit:fill; 可以解决
+
+mui 选项卡左右滑动容易出现误滑的情况，关掉滑动   mui('.mui-slider').slider().setStopped(true); //禁止轮播左右滑动  
+
+
+css3 设置透明度和颜色的线性渐变  				设置颜色的线性渐变
+	background-image:linear-gradient(  			background: -webkit-gradient(linear, 0 100%, 0 45%,from(#000000),to(
+	to top, 																#333333));
+    rgba(0,0,0,1) 0%,   
+    rgba(0,0,0,0.8) 25%,   
+    rgba(0,0,0,0.7) 35%,
+    rgba(0,0,0,0.6) 40%, 
+    rgba(0,0,0,0.3) 55%,
+    rgba(0,0,0,0.2) 70%,
+    rgba(0,0,0,0.1) 75%, 
+    rgba(0,0,0,0) 100%
+    ); 
+
+
+mui 选项卡在部分安卓机型上会出现 可以横向滑动但不能点击标题来切换内容的问题？
+解决方法：mui框架会默认初始化当前页面的轮播组件；若轮播组件内容为js动态生成时（比如通过ajax动态获取），则需要在动态DOM生成后，就是你代码生成之后，再执行一次slider的初始化方法，重新获取动态添加的节点。以下为例
+					//获得slider插件对象
+					var gallery = mui('.mui-slider');
+					gallery.slider({
+						interval:0//自动轮播周期，若为0则不自动播放，默认为0；
+					});
+
+
+mui 输入控件弹出键盘的时候 header 标题出现错位  
+首先说一下为什么会出现这个情况，那是因为ios弹出软键盘的时候，webview的高度没有变化导致超出屏幕范围，而plus这时候又会自动把header的 position：fixed 属性设置为 position：relative，header就跟着滚动了。。。。
+
+plus.webview.currentWebview().setStyle({
+    	softinputMode: "adjustResize"  // 弹出软键盘时自动改变webview的高度
+	});
+
+
+
+1. 问题： mui 对于Android 页面的加载，有些页面会出现rem 单位不一致的问题 ，有些页面的宽度输出 为 0
+   原因： Android 系统的页面加载速度比较慢，在页面还未加载的时候就调用了 rem.js  方法，导致方法认为页面宽度为0，就会出现有些页面的样式出问题了 
+   		（还未验证原因，仅猜测）
+   解决方法：在 rem.js 的方法中 用本地缓存 手机的屏幕宽度，在判断在 clientWidth 为0时使用缓存的值来计算 根元素的 font-size值 
+   			附上ren.js 源码
+
+   	//rem js
+(function (doc, win) {
+	if(localStorage.getItem("ClientWidth") == null){
+		localStorage.setItem("ClientWidth",document.documentElement.clientWidth);
+
+	}
+
+    var docEl = doc.documentElement,
+        resizeEvt = 'onorientationchange' in window ? 'onorientationchange' : 'resize',
+        recalc = function () {
+            var clientWidth = docEl.clientWidth;
+  
+			if (!clientWidth) {
+				docEl.style.fontSize = 20 * (localStorage.getItem("ClientWidth") / 320) + 'px';
+				return;
+			}
+            if(clientWidth>=1080){
+            	docEl.style.fontSize = '67.5px';
+          
+            }
+ 			else if(clientWidth>=750){
+                docEl.style.fontSize = '46.875px';
+          
+            }else{
+                docEl.style.fontSize = 20 * (clientWidth / 320) + 'px';
+          
+            }
+        };
+
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener('DOMContentLoaded', recalc, false);
+})(document, window);
+
+2.localStorage 做本地缓存的时候只能存字符串，不能存数组对象
+	解决： 将要保存的数据使用 JSON.stringify() 转换  相应的，取出数据使用的时候也要用 JSON.parse()转换
+
+3. mui 做本地缓存的办法
+   问题：如何在页面后退中保持继续下载，进度条在下次进去的时候显示当前的下载进度？（类似于后台下载）
+   		如何保存下载的信息？（解决了）     如何做到断点续传？
+   		新增下载任务？(解决了)    删除下载任务？  
+   		用缓存的话，如果用户退出登录了，那要清空缓存吗？清空的话下次用户在登录就没了，不清空的话如果是另一个用户登录 下载信息就错了(解决了)
+
+   	解决思路：本地缓存 使用三个变量      下载中     暂停下载    已下载
+   	         在登录的时候就设置缓存数组，根据用户id来设置
+
+
+4.问题：有时候设置背景透明度渐变的时候会发现字体不会按照自己设置的颜色值显示
+  原因：设置的遮罩层把字体也覆盖了
+  解决方案：将字体的层级提高，设置字体的position：relative  z-index:10;
+
+
+5.关于地图定位
+    android 与 ios 的appkey不一致
+
+
+使用json-server 做假数据模拟 
+1. npm init
+2. npm install --save-dev json-server
+3. 创建一个json 文件
+4. 在 package.json 的scripts 选项里添加 "服务名":"json-server json文件名"
+5. npm run 服务名
